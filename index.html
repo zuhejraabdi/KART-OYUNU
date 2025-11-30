@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kart Eşleştirme Oyunu</title>
+<style>
+body { font-family: Arial; background:#222; color:#fff; display:flex; flex-direction:column; align-items:center; margin:0; padding:0; }
+h1 { margin:10px; }
+#game { display:grid; grid-template-columns: repeat(4, 80px); grid-gap:10px; margin-top:20px; }
+.card { width:80px; height:80px; background:#555; display:flex; align-items:center; justify-content:center; font-size:32px; cursor:pointer; border-radius:8px; }
+#score { margin-top:15px; font-size:20px; }
+</style>
+</head>
+<body>
+<h1>Kart Eşleştirme Oyunu</h1>
+<div id="game"></div>
+<div id="score">Skor: 0</div>
+
+<script>
+const cardsArray = ['🍎','🍌','🍇','🍉','🍒','🥝','🍍','🍓'];
+let cards = [...cardsArray, ...cardsArray]; // Çiftler
+cards.sort(() => 0.5 - Math.random());
+
+const gameDiv = document.getElementById('game');
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
+let score = 0;
+
+cards.forEach((symbol, index) => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.dataset.symbol = symbol;
+    card.textContent = '';
+    card.addEventListener('click', flipCard);
+    gameDiv.appendChild(card);
+});
+
+function flipCard(){
+    if(lockBoard) return;
+    if(this === firstCard) return;
+
+    this.textContent = this.dataset.symbol;
+
+    if(!firstCard){
+        firstCard = this;
+        return;
+    }
+
+    secondCard = this;
+    lockBoard = true;
+
+    if(firstCard.dataset.symbol === secondCard.dataset.symbol){
+        score++;
+        document.getElementById('score').textContent = 'Skor: ' + score;
+        resetCards(true);
+    } else {
+        setTimeout(() => {
+            firstCard.textContent = '';
+            secondCard.textContent = '';
+            resetCards(false);
+        }, 1000);
+    }
+}
+
+function resetCards(match){
+    if(match){
+        firstCard.removeEventListener('click', flipCard);
+        secondCard.removeEventListener('click', flipCard);
+    }
+    [firstCard, secondCard] = [null, null];
+    lockBoard = false;
+}
+</script>
+</body>
+</html>
+
